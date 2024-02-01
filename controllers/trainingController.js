@@ -4,7 +4,7 @@ const Trainingplans = require('../models/trainingplans.js')
 module.exports.get_all_trainingplans = (req, res) => {
     Trainingplans.find()
     .then((result) => {
-        res.status(200).send(result)
+        res.status(200).json(result)
     })
     .catch((err) => {
         res.status(err)
@@ -33,13 +33,15 @@ module.exports.get_trainingplan = (req, res) => {
 module.exports.post_trainingplan = (req, res) => {
     const body = req.body
 
+    // implement author binding off user submission
+    body.author="jona-young"
+
     let trainingplan = new Trainingplans(body)
     trainingplan.save()
     .then((result) => {
         res.status(200).send(result)
     })
     .catch((err) => {
-        console.log(err)
         res.status(400).send({ result: 'There was an issue saving your training plan.'})
     })
 }

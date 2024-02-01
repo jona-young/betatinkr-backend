@@ -1,5 +1,9 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const { dateGetter } = require('../helpers/dateGetter')
+const { dateSetter} = require('../helpers/dateSetter')
+const { floatGetter } = require('../helpers/floatGetter')
+
 
 const trainingSchema = new Schema({
     name: {
@@ -8,11 +12,15 @@ const trainingSchema = new Schema({
     },
     startDate: {
         type: Date,
-        required: true
+        required: true,
+        get: dateGetter,
+        set: dateSetter
     },
     endDate: {
         type: Date,
-        required: true
+        required: true,
+        get: dateGetter,
+        set: dateSetter
     },
     activityType: {
         type: String,
@@ -29,11 +37,15 @@ const trainingSchema = new Schema({
         },
         startDate: {
             type: Date,
-            required: true
+            required: true,
+            get: dateGetter,
+            set: dateSetter
         },
         endDate: {
             type: Date,
-            required: true
+            required: true,
+            get: dateGetter,
+            set: dateSetter
         },
         deload: {
           type: Boolean,
@@ -57,34 +69,40 @@ const trainingSchema = new Schema({
                     exercises: [{
                         name: {
                             type: String,
-                            required: true
+                            required: false
                         },
                         reps: {
                             type: Number,
-                            required: true
+                            required: false
                         },
                         sets: {
                             type: Number,
-                            required: true
+                            required: false
                         },
-                        intesity: {
+                        intensity: {
                             type: mongoose.Types.Decimal128,
-                            required: true,
+                            required: false,
+                            get: floatGetter
                         },
                         units: {
                             type: String,
-                            required: true
+                            required: false
                         },
                         rest: {
                             type: mongoose.Types.Decimal128,
-                            required: true
-                        }
+                            required: false,
+                            get: floatGetter
+                        },
+                        restUnits: {
+                            type: String,
+                            required: false
+                        },
                     }]
                 }]
             }]
         }]
     }]
-})
+}, { toJSON: { getters: true } })
 
 const Trainingplans = mongoose.model('trainingplan', trainingSchema);
 module.exports = Trainingplans;
