@@ -13,18 +13,12 @@ module.exports.get_all_trainingplans = (req, res) => {
 
 // GET - retrieve all user training plans
 module.exports.get_user_trainingplans = (req, res) => {
-    res.status(200).send(['user training plan 1', 'user training plan 2'])
-}
+    const uid = req.auth.uid
 
-// GET - retrieve individual training plans based off :id
-module.exports.get_trainingplan = (req, res) => {
-    const id = req.params.id;
-
-    Trainingplans.findById(id)
+    Trainingplans.find({ author: uid })
     .then((result) => {
         res.status(200).send(result)
-    })
-    .catch((err) => {
+    }).catch((err) => {
         res.status(err)
     })
 }
@@ -32,9 +26,10 @@ module.exports.get_trainingplan = (req, res) => {
 // POST - create a training plan
 module.exports.post_trainingplan = (req, res) => {
     const body = req.body
+    const uid = req.auth.uid
 
     // implement author binding off user submission
-    body.author="jona-young"
+    body.author=uid
 
     let trainingplan = new Trainingplans(body)
     trainingplan.save()
@@ -50,7 +45,7 @@ module.exports.put_trainingplan = (req, res) => {
     const id = req.params.id;
     const body = req.body;
 
-    Trainingplans.findByIdAndUpdate(id, body)
+    Trainingplans.findByIdAndUpdate(id, body, {new: true})
     .then((result) => {
         res.status(200).send(result)
     })
