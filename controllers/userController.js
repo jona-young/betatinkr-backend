@@ -4,6 +4,8 @@ const { jwtDecode } = require('jwt-decode')
 const User = require('../models/user.js');
 const Token = require('../models/token.js')
 const { handleErrors } = require('../helpers/handleErrors.js')
+const { resetPasswordEmail } = require('../helpers/resetPasswordEmail.js')
+const bcrypt = require('bcrypt')
 
 module.exports.login = async (req, res) => {
     const { email, password } = req.body
@@ -105,6 +107,57 @@ module.exports.refresh_token = async (req, res) => {
         return res.status(200).json({ accessToken: token })
     } catch(err) {
         return res.status(500).json({message: 'Could not refresh token'})
+    }
+}
+
+module.exports.forgot_password = async (req, res) => {
+    const { email } = req.body
+
+    try {
+        const resetCode = Math.floor(100000 + Math.random() * 900000)
+        const resetCodeExpiration = Date.now() + 15 * 60 * 1000 //min * sec per min * sec per ms
+        const body = { resetCode: resetCode, resetCodeExpiration: resetCodeExpiration}
+
+        User.findOneAndUpdate({email: email}, body)
+        .then(async (result) => {
+            await resetPasswordEmail(result.email, result.firstName, result.lastName, resetCode)
+
+            return res.status(200).send({ result: true, message: 'If the user exists, an email was sent'})
+        }).catch((err) => {
+            return res.status(400).send({ result: false, message: 'If the user exists, an email was sent'})
+        })
+    } catch(err) {
+        return res.send({ result: false, message: 'If the user exists, an email was sent'})
+    }
+}
+
+module.exports.reset_password = async (req, res) => {
+    const { email, resetCode, password } = req.body
+
+    try {
+        User.findOne({email: email})
+        .then(async (result) => {
+            if (!result || result.resetCode != resetCode) {
+                return res.status(401).send({ result: false, message: 'Please try to reset your password again'})
+            }
+
+            if (result.resetCodeExpiration < new Date()) {
+                return res.status(402).send({ result: false, message: 'Token has expired, please try again!'})
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10)
+            
+            User.findOneAndUpdate({email: email}, {password: hashedPassword, resetCode: '', resetCodeExpiration: null})
+            .then(async (result) => {
+                return res.status(200).send({ result: true, message: 'Password reset!'})
+            }).catch((err) => {
+                return res.status(403).send({ result: false, message: 'An error occured resetting your password. Please try again!'})
+            })
+        }).catch((err) => {
+            res.status(400).send({ result: false, message: 'No user with that email'})
+        })
+    } catch (err) {
+        return res.status(500).send({result: false, message: 'An error occured resetting your password. Please try again!'})
     }
 }
 

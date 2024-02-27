@@ -12,6 +12,13 @@ userRouter.post('/api/signup', userController.signup);
 // Refresh Token POST route
 userRouter.post('/api/refresh-token', userController.refresh_token);
 
+// Forgot Password POST route
+userRouter.post('/api/forgot-password', userController.forgot_password);
+
+// Reset Password POST route
+userRouter.post('/api/reset-password', userController.reset_password);
+
+
 // // Delete user DELETE route
 // userRouter.delete('/api/delete/:id', userController.user_delete)
 
