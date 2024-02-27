@@ -21,8 +21,8 @@ mongoose.set('strictQuery', true);
 
 // middleware
 app.use(cors())
-app.use(express.urlencoded({ extended: false }))
-app.use(express.json());
+app.use(express.urlencoded({ limit: '25mb', extended: false }))
+app.use(express.json({limit: '25mb'}));
 app.use(morgan('dev'));
 
 //routes

@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 require('dotenv').config();
 
-const resetPasswordEmail = async (toAddress, firstName, lastName, id, token) => {
+const resetPasswordEmail = async (toAddress, firstName, lastName, token) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 587,
@@ -15,7 +15,7 @@ const resetPasswordEmail = async (toAddress, firstName, lastName, id, token) => 
     const info = await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: toAddress,
-        subject: "betatinkr - Password Reset Confirmation",
+        subject: "betaTinkr - Password Reset Confirmation",
         html: `
         <html>
             <head>
@@ -25,18 +25,18 @@ const resetPasswordEmail = async (toAddress, firstName, lastName, id, token) => 
                     Dear ${firstName + ' ' + lastName},
                     <br>
                     <br>
-                    You recently requested a new password for your betatinkr account.
-                    If you made this request, please click the link below and follow the instructions.
+                    You recently requested a new password for your betaTinkr account. Enter this 6-digit code on the password
+                    reset page in the mobile application:
                     <br>
-                    <a href="${process.env.CLIENT_APP}/reset-password/${id}/${token}">Click Here!</a>
+                    ${token}
                     <br>
                     <br>
                     Regards,
                     <br>
                     <br>
-                    <b>betatinkr Support(AUTOMATED)</b>
+                    <b>betaTinkr Support(AUTOMATED)</b>
                     <br>
-                    E: <a href="mailto:betatinkr.services@gmail.com">betatinkr.services@gmail.com</a>
+                    E: <a href="mailto:${process.env.EMAIL_USER}">${process.env.EMAIL_USER}</a>
                 </p>
             </body>
         </html>
@@ -49,4 +49,4 @@ const resetPasswordEmail = async (toAddress, firstName, lastName, id, token) => 
     }
 }
 
-module.exports = resetPasswordEmail;
+module.exports = {resetPasswordEmail};

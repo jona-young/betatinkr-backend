@@ -31,7 +31,15 @@ const userSchema = new Schema({
     trainingplans: [{
         type: String,
         required: false
-    }]
+    }],
+    resetCode: {
+        type: String,
+        required: false
+    },
+    resetCodeExpiration: {
+        type: Date,
+        required: false
+    }
 }, {timestamps: true});
 
 // Before user created
