@@ -1,4 +1,6 @@
 const Trainingplans = require('../models/trainingplans.js')
+const { handleTrainingPlanErrors } = require('../helpers/handleErrors.js')
+
 
 // GET - retrieve all training plans
 module.exports.get_all_trainingplans = (req, res) => {
@@ -37,9 +39,13 @@ module.exports.post_trainingplan = (req, res) => {
         res.status(200).send(result)
     })
     .catch((err) => {
-        res.status(400).send({ result: 'There was an issue saving your training plan.'})
+        const errors = handleTrainingPlanErrors(err)
+
+        console.log(errors)
+        res.status(400).json({ errors });
     })
 }
+
 // PUT - update training plan
 module.exports.put_trainingplan = (req, res) => {
     const id = req.params.id;
