@@ -1,5 +1,11 @@
 const { Router } = require('express');
 const userController = require('../controllers/userController.js');
+var { expressjwt: jwt } = require("express-jwt");
+
+const requireAuth = jwt({
+    secret: process.env.JWTSECRET,
+    algorithms: ['HS256']
+})
 
 const userRouter = Router();
 
@@ -18,6 +24,17 @@ userRouter.post('/api/forgot-password', userController.forgot_password);
 // Reset Password POST route
 userRouter.post('/api/reset-password', userController.reset_password);
 
+// Activity Template POST route
+userRouter.post('/api/activity-template', requireAuth, userController.activity_template)
+
+// Activity Template GET route
+userRouter.get('/api/user-activity-templates', requireAuth, userController.get_user_activity_templates)
+
+// Activity Template PUT route
+userRouter.put('/api/activity-template/:id', requireAuth, userController.update_activity_template)
+
+// Activity Template DELETE route
+userRouter.put('/api/delete-activity-template', requireAuth, userController.delete_activity_template)
 
 // // Delete user DELETE route
 // userRouter.delete('/api/delete/:id', userController.user_delete)

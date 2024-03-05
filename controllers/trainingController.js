@@ -45,7 +45,6 @@ module.exports.post_trainingplan = (req, res) => {
         res.status(400).json({ errors });
     })
 }
-
 // PUT - update training plan
 module.exports.put_trainingplan = (req, res) => {
     const id = req.params.id;
