@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
+const { floatGetter } = require('../helpers/floatGetter')
+
 
 const userSchema = new Schema({
     firstName: {
@@ -32,6 +34,44 @@ const userSchema = new Schema({
         type: String,
         required: false
     }],
+    activityTemplates: [{
+        name: {
+            type: String,
+            required: true
+        },
+        exercises: [{
+            name: {
+                type: String,
+                required: false
+            },
+            reps: {
+                type: Number,
+                required: false
+            },
+            sets: {
+                type: Number,
+                required: false
+            },
+            intensity: {
+                type: mongoose.Types.Decimal128,
+                required: false,
+                get: floatGetter
+            },
+            units: {
+                type: String,
+                required: false
+            },
+            rest: {
+                type: mongoose.Types.Decimal128,
+                required: false,
+                get: floatGetter
+            },
+            restUnits: {
+                type: String,
+                required: false
+            },
+        }]
+    }],
     resetCode: {
         type: String,
         required: false
@@ -40,7 +80,7 @@ const userSchema = new Schema({
         type: Date,
         required: false
     }
-}, {timestamps: true});
+}, {timestamps: true, toJSON: { getters: true }});
 
 // Before user created
 userSchema.pre('save', async function(next) {

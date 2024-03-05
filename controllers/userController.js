@@ -6,6 +6,7 @@ const Token = require('../models/token.js')
 const { handleUserErrors } = require('../helpers/handleErrors.js')
 const { resetPasswordEmail } = require('../helpers/resetPasswordEmail.js')
 const bcrypt = require('bcrypt')
+const { floatGetter } = require('../helpers/floatGetter.js')
 
 module.exports.login = async (req, res) => {
     const { email, password } = req.body
@@ -170,6 +171,97 @@ module.exports.reset_password = async (req, res) => {
     } catch (err) {
         return res.status(500).send({resetCode: 'An error occured resetting your password. Please try again!', password: '', confirmPassword: ''})
     }
+}
+
+module.exports.activity_template = async (req, res) => {
+    const body = req.body
+    const uid = req.auth.uid
+
+    try {
+        User.findById(uid)
+        .then((result) => {
+            let updatedTemplates = [ ...result.activityTemplates ]
+    
+            updatedTemplates = updatedTemplates.concat(body)
+
+            User.findByIdAndUpdate(uid, { activityTemplates: updatedTemplates }, {new: true})
+            .then((result) => {
+                res.status(200).send(result)
+            })
+            .catch((err) => {
+                res.status(err)
+            })
+        }).catch((err) => {
+            res.status(err)
+        })
+    } catch (err) {
+        res.status(400).json({ errors });
+    }
+
+}
+
+module.exports.get_user_activity_templates = async (req, res) => {
+    const uid = req.auth.uid
+
+    User.findById(uid)
+    .then((result) => {
+        res.status(200).json(result.activityTemplates)
+    }).catch((err) => {
+        res.status(err)
+    })
+}
+
+module.exports.update_activity_template = async (req, res) => {
+    const uid = req.auth.uid
+    const templateId = req.params.id
+    const body = req.body
+
+    User.findById(uid)
+    .then((result) => {
+        let updatedTemplates = result.activityTemplates.map((activity, idx) => {
+            if (idx == templateId) {
+                return body
+            } else {
+                return activity
+            }
+        })
+
+        User.findByIdAndUpdate(uid, {activityTemplates: updatedTemplates})
+        .then((updateResult) => {
+            res.status(200).send({ message: 'success'})
+        }).catch((err) => {
+            res.status(err)
+        })
+    }).catch((err) => {
+        res.status(err)
+    })
+}
+
+module.exports.delete_activity_template = async (req, res) => {
+    const uid = req.auth.uid
+    const templateId = req.body.id
+
+    User.findById(uid)
+    .then((result) => {
+        let updatedTemplates = result.activityTemplates.map((activity, idx) => {
+            if (activity._id.toString() !== templateId) {
+                return activity
+            }
+        })
+
+        if (updatedTemplates.length == 1 && updatedTemplates[0] == null) {
+            updatedTemplates = []
+        }
+
+        User.findByIdAndUpdate(uid, {activityTemplates: updatedTemplates})
+        .then((updateResult) => {
+            res.status(200)
+        }).catch((err) => {
+            res.status(err)
+        })
+    }).catch((err) => {
+        res.status(err)
+    })
 }
 
 // // DELETE :id
