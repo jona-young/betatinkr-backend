@@ -61,6 +61,10 @@ const trainingSchema = new Schema({
                     type: String,
                     required: true
                 },
+                notes: {
+                    type: String,
+                    required: false
+                },
                 activities: [{
                     name: {
                         type: String,

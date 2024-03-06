@@ -34,7 +34,7 @@ userRouter.get('/api/user-activity-templates', requireAuth, userController.get_u
 userRouter.put('/api/activity-template/:id', requireAuth, userController.update_activity_template)
 
 // Activity Template DELETE route
-userRouter.put('/api/delete-activity-template', requireAuth, userController.delete_activity_template)
+userRouter.put('/api/delete-activity-template/:id', requireAuth, userController.delete_activity_template)
 
 // // Delete user DELETE route
 // userRouter.delete('/api/delete/:id', userController.user_delete)

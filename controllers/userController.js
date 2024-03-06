@@ -186,7 +186,7 @@ module.exports.activity_template = async (req, res) => {
 
             User.findByIdAndUpdate(uid, { activityTemplates: updatedTemplates }, {new: true})
             .then((result) => {
-                res.status(200).send(result)
+                res.status(200).json(result.activityTemplates)
             })
             .catch((err) => {
                 res.status(err)
@@ -197,7 +197,6 @@ module.exports.activity_template = async (req, res) => {
     } catch (err) {
         res.status(400).json({ errors });
     }
-
 }
 
 module.exports.get_user_activity_templates = async (req, res) => {
@@ -237,25 +236,24 @@ module.exports.update_activity_template = async (req, res) => {
     })
 }
 
+//issue with receiving a response
 module.exports.delete_activity_template = async (req, res) => {
     const uid = req.auth.uid
-    const templateId = req.body.id
+    const templateId = req.params.id
 
     User.findById(uid)
     .then((result) => {
-        let updatedTemplates = result.activityTemplates.map((activity, idx) => {
-            if (activity._id.toString() !== templateId) {
-                return activity
-            }
+        let updatedTemplates = result.activityTemplates.filter((activity) => {
+            return activity._id.toString() !== templateId
         })
 
         if (updatedTemplates.length == 1 && updatedTemplates[0] == null) {
             updatedTemplates = []
         }
 
-        User.findByIdAndUpdate(uid, {activityTemplates: updatedTemplates})
+        User.findByIdAndUpdate(uid, {activityTemplates: updatedTemplates},  {new: true})
         .then((updateResult) => {
-            res.status(200)
+            res.status(200).json(updateResult.activityTemplates)
         }).catch((err) => {
             res.status(err)
         })
