@@ -62,10 +62,16 @@ module.exports.put_trainingplan = (req, res) => {
 // DELETE - delete training plan
 module.exports.delete_trainingplan = (req, res) => {
     const id = req.params.id;
-    
+    const uid = req.auth.uid
+
     Trainingplans.findByIdAndDelete(id)
-    .then((result) => {
-        res.status(200).send(result)
+    .then(() => {
+        Trainingplans.find({ author: uid })
+        .then((result) => {
+            res.status(200).send(result)
+        }).catch((err) => {
+            res.status(err)
+        })
     })
     .catch((err) => {
         res.status(err)
